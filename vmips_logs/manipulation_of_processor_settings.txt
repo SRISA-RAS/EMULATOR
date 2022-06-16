@@ -1,0 +1,142 @@
+29 Reg write t4=0000000011223344
+30 PC=0xbfc0106c [1fc0106c]     408c5000 mtc0   $t4,$10 # EntryHi
+31 PC=0xbfc01070 [1fc01070]     000000c0 ehb
+32 PC=0xbfc01074 [1fc01074]     42000002 tlbwi
+32 tlb write  0:    4K . 0 0000000011222000-0000000011223fff g 44 . 00000000 0 dvrx . 00000000 0 dvrx 1
+33 PC=0xbfc01078 [1fc01078]     40805000 mtc0   $r0,$10 # EntryHi
+34 PC=0xbfc0107c [1fc0107c]     000000c0 ehb
+35 PC=0xbfc01080 [1fc01080]     42000001 tlbr
+36 PC=0xbfc01084 [1fc01084]     400c5000 mfc0   $t4,$10 # EntryHi
+36 Reg write t4=0000000011222044
+14	Гипервизор программирует корневую TLB
+
+41 Reg write t4=0000000000000000
+42 PC=0xbfc0109c [1fc0109c]     408c4806 mtc0   $t4,$9,6 # MPUIndexAddr
+...
+43 Reg write t4=000000001fc00000
+44 PC=0xbfc010a4 [1fc010a4]     408c4807 mtc0   $t4,$9,7 # MPUIndexData
+...
+45 Reg write t4=0000000000000001
+46 PC=0xbfc010ac [1fc010ac]     408c4806 mtc0   $t4,$9,6 # MPUIndexAddr
+...
+47 Reg write t4=0000000000010000
+48 PC=0xbfc010b4 [1fc010b4]     408c4807 mtc0   $t4,$9,7 # MPUIndexData
+...
+49 Reg write t4=0000000000000002
+50 PC=0xbfc010bc [1fc010bc]     408c4806 mtc0   $t4,$9,6 # MPUIndexAddr
+...
+53 Reg write t4=c00000000000ffff
+54 PC=0xbfc010cc [1fc010cc]     408c4807 mtc0   $t4,$9,7 # MPUIndexData
+...
+55 Reg write t4=0000000000000000
+56 PC=0xbfc010d4 [1fc010d4]     408c4806 mtc0   $t4,$9,6 # MPUIndexAddr
+...
+58 PC=0xbfc010dc [1fc010dc]     400c4807 mfc0   $t4,$9,7 # MPUIndexData
+58 Reg write t4=000000001fc00000
+...
+59 Reg write t4=0000000000000001
+60 PC=0xbfc010e4 [1fc010e4]     408c4806 mtc0   $t4,$9,6 # MPUIndexAddr
+...
+62 PC=0xbfc010ec [1fc010ec]     400c4807 mfc0   $t4,$9,7 # MPUIndexData
+62 Reg write t4=0000000000010000
+...
+63 Reg write t4=0000000000000002
+64 PC=0xbfc010f4 [1fc010f4]     408c4806 mtc0   $t4,$9,6 # MPUIndexAddr
+...
+66 PC=0xbfc010fc [1fc010fc]     400c4807 mfc0   $t4,$9,7 # MPUIndexData
+66 Reg write t4=000000000000ffff
+...
+88 PC=0xbfc01154 [1fc01154]     42000018 eret
+[VZ] MPU GVA: ffffffffbfc00000 GPA: 000000001fc00000 HPA: 0000000000010000 CCA: 8
+[VZ] 89 PC=0xbfc00000 [1fc00000]        240c0000 addiu  $t4,$r0,0x0
+[VZ] 89 Reg write t4=0000000000000000
+15	Гипервизор настраивает MPU и запускает задачу
+
+[VZ] 89 Reg write t4=0000000000000000
+[VZ] 90 PC=0xbfc00004 [1fc00004]        408c4806 mtc0 $t4,$9,6 # MPUIndexAddr
+...
+[VZ] 91 Reg write t4=000000001fc00000
+[VZ] 92 PC=0xbfc0000c [1fc0000c]        408c4807 mtc0 $t4,$9,7 # MPUIndexData
+...
+[VZ] 93 Reg write t4=0000000000000001
+[VZ] 94 PC=0xbfc00014 [1fc00014]     408c4806 mtc0 $t4,$9,6 # MPUIndexAddr
+...
+[VZ] 95 Reg write t4=0000000000020000
+[VZ] 96 PC=0xbfc0001c [1fc0001c]     408c4807 mtc0 $t4,$9,7 # MPUIndexData
+...
+[VZ] 97 Reg write t4=0000000000000002
+[VZ] 98 PC=0xbfc00024 [1fc00024]     408c4806 mtc0 $t4,$9,6 # MPUIndexAddr
+...
+[VZ] 101 Reg write t4=c00000000000ffff
+[VZ] 102 PC=0xbfc00034 [1fc00034]    408c4807 mtc0 $t4,$9,7 # MPUIndexData
+...
+[VZ] 103 Reg write t4=0000000000000000
+[VZ] 104 PC=0xbfc0003c [1fc0003c]    408c4806 mtc0   $t4,$9,6 # MPUIndexAddr
+[VZ] 105 PC=0xbfc00040 [1fc00040]    000000c0 ehb
+[VZ] 106 PC=0xbfc00044 [1fc00044]    400c4807 mfc0   $t4,$9,7 # MPUIndexData
+[VZ] 106 Reg write t4=0000000000000000
+...
+[VZ] 107 Reg write t4=0000000000000001
+[VZ] 108 PC=0xbfc0004c [1fc0004c]    408c4806 mtc0   $t4,$9,6 # MPUIndexAddr
+[VZ] 109 PC=0xbfc00050 [1fc00050]    000000c0 ehb
+[VZ] 110 PC=0xbfc00054 [1fc00054]    400c4807 mfc0   $t4,$9,7 # MPUIndexData
+[VZ] 110 Reg write t4=0000000000000000
+...
+[VZ] 111 Reg write t4=0000000000000002
+[VZ] 112 PC=0xbfc0005c [1fc0005c]    408c4806 mtc0   $t4,$9,6 # MPUIndexAddr
+[VZ] 113 PC=0xbfc00060 [1fc00060]    000000c0 ehb
+[VZ] 114 PC=0xbfc00064 [1fc00064]    400c4807 mfc0   $t4,$9,7 # MPUIndexData
+[VZ] 114 Reg write t4=0000000000000000
+16	Задача пытается работать с регистрами настройки MPU
+
+[VZ] 117 PC=0xbfc00070 [1fc00070]       bd9d0000 cache  0x1d,0x0($t4) # D-Fetch and Lock
+[VZ] 118 PC=0xbfc00074 [1fc00074]       3c0c8100 lui    $t4,0x8100
+[VZ] 118 Reg write t4=ffffffff81000000
+[VZ] 119 PC=0xbfc00078 [1fc00078]       bd940000 cache  0x14,0x0($t4) # I-Fill
+[VZ] MPU GVA: ffffffff81000000 GPA: 0000000001000000 HPA: 0000000000010000 CCA: 4
+[VZ] 119 icache  bd940000 load  miss refill   pol=4 VA=ffffffff81000000 PA=000010000 line=00 hitv=00000000 ro=01234567 tag=000000 V=00000000 L=00000000               
+[VZ] 119 dmemacc: fetch 8 addr=000010000 data=240c0000408c4806 mask=11111111 cline 
+[VZ] 119 dmemacc: fetch 8 addr=000010008 data=3c0c1fc0408c4807 mask=11111111 cline 
+[VZ] 119 dmemacc: fetch 8 addr=000010010 data=240c0001408c4806 mask=11111111 cline 
+[VZ] 119 dmemacc: fetch 8 addr=000010018 data=3c0c0002408c4807 mask=11111111 cline 
+[VZ] 119 icache+ bd940000 load  miss refill   pol=4 VA=ffffffff81000000 PA=000010000 line=00 hitv=00000001 ro=12345670 tag=000010 V=00000001 L=00000000               
+[VZ] 120 PC=0xbfc0007c [1fc0007c]       3c0c8200 lui    $t4,0x8200
+[VZ] 120 Reg write t4=ffffffff82000000
+[VZ] 121 PC=0xbfc00080 [1fc00080]       bd940000 cache  0x14,0x0($t4) # I-Fill                                                                        
+121 Exception Guest, cause=00000008(TLBL) at PC=ffffffffbfc00080 triggered, instr=bd940000                                                                            
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc00078 [1fc00078]  bd940000 cache  0x14,0x0($t4) # I-Fill
+    0xbfc0007c [1fc0007c]  3c0c8200 lui    $t4,0x8200
+    0xbfc00080 [1fc00080]  bd940000 cache  0x14,0x0($t4) # I-Fill
+    0xbfc00084 [1fc00084]  3c0c8100 lui    $t4,0x8100
+    0xbfc00088 [1fc00088]  bd850000 cache  0x5,0x0($t4) # D-Index Load Tag                                                                            
+122 PC=0xbfc00380 [1fc00380]    40ac4003 dmtc0  $t4,$8,3 # Scratch1
+123 PC=0xbfc00384 [1fc00384]    402c7000 dmfc0  $t4,$14 # EPC
+123 Reg write t4=ffffffffbfc00080
+...
+127 PC=0xbfc00394 [1fc00394]    42000018 eret
+[VZ] 128 PC=0xbfc00084 [1fc00084]       3c0c8100 lui    $t4,0x8100
+[VZ] 128 Reg write t4=ffffffff81000000
+[VZ] 129 PC=0xbfc00088 [1fc00088]       bd850000 cache  0x5,0x0($t4) # D-Index Load Tag
+129 Exception Guest, cause=0000006c(GE) at PC=ffffffffbfc00088 triggered, instr=bd850000
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc00080 [1fc00080]  bd940000 cache  0x14,0x0($t4) # I-Fill
+    0xbfc00084 [1fc00084]  3c0c8100 lui    $t4,0x8100
+    0xbfc00088 [1fc00088]  bd850000 cache  0x5,0x0($t4) # D-Index Load Tag
+    0xbfc0008c [1fc0008c]  3c0c8100 lui    $t4,0x8100
+    0xbfc00090 [1fc00090]  bd890000 cache  0x9,0x0($t4) # D-Index Store Tag
+130 PC=0xbfc00380 [1fc00380]    40ac4003 dmtc0  $t4,$8,3 # Scratch1
+131 PC=0xbfc00384 [1fc00384]    402c7000 dmfc0  $t4,$14 # EPC
+131 Reg write t4=ffffffffbfc00088
+17	Задача использует инструкцию cache. Запрещённые операции блокируются и управление переходит в гипервизор
+
+143 PC=0xbfc00394 [1fc00394]    42000018 eret
+[VZ] 144 PC=0xbfc00094 [1fc00094]       40805000 mtc0   $r0,$10 # EntryHi
+[VZ] 145 PC=0xbfc00098 [1fc00098]       000000c0 ehb
+[VZ] 146 PC=0xbfc0009c [1fc0009c]       42000001 tlbr
+[VZ] 147 PC=0xbfc000a0 [1fc000a0]       400c5000 mfc0   $t4,$10 # EntryHi
+[VZ] 147 Reg write t4=00000000000000c1
+18	Задача обращается к TLB. Доступ происходит в гостевое TLB, а не корневое
+

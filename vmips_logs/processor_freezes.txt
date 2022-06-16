@@ -1,0 +1,129 @@
+81 PC=0xbfc0113c [1fc0113c]     03e00008 jr     $ra
+82 PC=0xbfc01140 [1fc01140]     00000000 nop
+83 PC=0xbfc010ec [1fc010ec]     42000018 eret
+[VZ] 84 PC=0xbfc00000 [1fc00000]        0bf00400 j      0xbfc01000
+[VZ] 85 PC=0xbfc00004 [1fc00004]        00000000 nop
+1	Запуск первой задачи
+
+[VZ] 86 PC=0xbfc01000 [1fc01000]        8c000001 lw     $r0,0x1($r0)
+[VZ] 86 Exception AddrError, cause=00000010(AdEL) at PC=ffffffffbfc01000 triggered, instr=8c000001
+[VZ]   Delay state is NORMAL; mem access mode is data load
+[VZ]   Instruction dump:
+[VZ]     0xbfc00ff8 [1fc00ff8]  00000000 nop
+[VZ]     0xbfc00ffc [1fc00ffc]  00000000 nop
+[VZ]     0xbfc01000 [1fc01000]  8c000001 lw     $r0,0x1($r0)
+[VZ]     0xbfc01004 [1fc01004]  43ffffe0 wait   0x7ffff
+[VZ]     0xbfc01008 [1fc01008]  00000000 nop
+[VZ] 87 PC=0xbfc00380 [1fc00380]        8c000001 lw     $r0,0x1($r0)
+[VZ] 87 Exception AddrError, cause=00000010(AdEL) at PC=ffffffffbfc00380 triggered, instr=8c000001
+[VZ]   Delay state is NORMAL; mem access mode is data load
+[VZ]   Instruction dump:
+[VZ]     0xbfc00378 [1fc00378]  00000000 nop
+[VZ]     0xbfc0037c [1fc0037c]  00000000 nop
+[VZ]     0xbfc00380 [1fc00380]  8c000001 lw     $r0,0x1($r0)
+[VZ]     0xbfc00384 [1fc00384]  42000018 eret
+[VZ]     0xbfc00388 [1fc00388]  00000000 nop
+[VZ] 88 PC=0xbfc00380 [1fc00380]        8c000001 lw     $r0,0x1($r0)
+2	Задача зависла в бесконечном цикле исключений из-за обращения по невыровненному адресу
+
+[VZ] 1028 PC=0xbfc00380 [1fc00380]      8c000001 lw     $r0,0x1($r0)
+[VZ] 1028 Exception AddrError, cause=00000010(AdEL) at PC=ffffffffbfc00380 triggered, instr=8c000001
+[VZ]   Delay state is NORMAL; mem access mode is data load
+[VZ]   Instruction dump:
+[VZ]     0xbfc00378 [1fc00378]  00000000 nop
+[VZ]     0xbfc0037c [1fc0037c]  00000000 nop
+[VZ]     0xbfc00380 [1fc00380]  8c000001 lw     $r0,0x1($r0)
+[VZ]     0xbfc00384 [1fc00384]  42000018 eret
+[VZ]     0xbfc00388 [1fc00388]  00000000 nop
+1028 Exception Interrupt, cause=00008000(Int) at PC=ffffffffbfc00380 triggered, instr=8c000001
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc00378 [1fc00378]  00000000 nop
+    0xbfc0037c [1fc0037c]  00000000 nop
+    0xbfc00380 [1fc00380]  8c000001 lw     $r0,0x1($r0)
+    0xbfc00384 [1fc00384]  42000018 eret
+    0xbfc00388 [1fc00388]  00000000 nop
+1029 PC=0xbfc00380 [1fc00380]   40ac4003 dmtc0  $t4,$8,3 # Scratch1
+1030 PC=0xbfc00384 [1fc00384]   40ad4803 dmtc0  $t5,$9,3 # Scratch2
+3	Бесконечный цикл зависания прерывается прерыванием гипервизора
+
+
+
+1080 PC=0xbfc01190 [1fc01190]   03e00008 jr     $ra
+1081 PC=0xbfc01194 [1fc01194]   00000000 nop
+1082 PC=0xbfc00438 [1fc00438]   402c4003 dmfc0  $t4,$8,3 # Scratch1
+1082 Reg write t4=0000000000010000
+1083 PC=0xbfc0043c [1fc0043c]   402d4803 dmfc0  $t5,$9,3 # Scratch2
+1083 Reg write t5=0000000000000001
+1084 PC=0xbfc00440 [1fc00440]   42000018 eret
+[VZ] 1085 PC=0xbfc00000 [1fc00000]      0bf00400 j      0xbfc01000
+[VZ] 1086 PC=0xbfc00004 [1fc00004]      00006825 or     $t5,$r0,$r0
+[VZ] 1086 Reg write t5=0000000000000000
+[VZ] 1087 PC=0xbfc01000 [1fc01000]      11a0ffff beq    $t5,$r0,0xbfc01000
+[VZ] 1088 PC=0xbfc01004 [1fc01004]      400c4800 mfc0   $t4,$9 # Count
+[VZ] 1088 Reg write t4=0000000000000441
+4	Гипервизор включает другую задачу, которая выполняется штатно
+
+[VZ] 2037 PC=0xbfc01000 [1fc01000]      11a0ffff beq    $t5,$r0,0xbfc01000
+[VZ] 2038 PC=0xbfc01004 [1fc01004]      400c4800 mfc0   $t4,$9 # Count
+[VZ] 2038 Reg write t4=00000000000007f7
+2038 Exception Interrupt, cause=00008000(Int) at PC=ffffffffbfc01000 triggered, instr=400c4800
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc00ff8 [1fc00ff8]  00000000 nop
+    0xbfc00ffc [1fc00ffc]  00000000 nop
+    0xbfc01000 [1fc01000]  11a0ffff beq    $t5,$r0,0xbfc01000
+    0xbfc01004 [1fc01004]  400c4800 mfc0   $t4,$9 # Count
+    0xbfc01008 [1fc01008]  43ffffe0 wait   0x7ffff
+2039 PC=0xbfc00380 [1fc00380]   40ac4003 dmtc0  $t4,$8,3 # Scratch1
+2040 PC=0xbfc00384 [1fc00384]   40ad4803 dmtc0  $t5,$9,3 # Scratch2
+5	Штатная работа задачи прерывается прерыванием гипервизора
+
+2090 PC=0xbfc00438 [1fc00438]   402c4003 dmfc0  $t4,$8,3 # Scratch1
+2090 Reg write t4=00000000000007f7
+2091 PC=0xbfc0043c [1fc0043c]   402d4803 dmfc0  $t5,$9,3 # Scratch2
+2091 Reg write t5=0000000000000000
+2092 PC=0xbfc00440 [1fc00440]   42000018 eret
+[VZ] 2093 PC=0xbfc00380 [1fc00380]      8c000001 lw     $r0,0x1($r0)
+[VZ] 2093 Exception AddrError, cause=00000010(AdEL) at PC=ffffffffbfc00380 triggered, instr=8c000001
+[VZ]   Delay state is NORMAL; mem access mode is data load
+[VZ]   Instruction dump:
+[VZ]     0xbfc00378 [1fc00378]  00000000 nop
+[VZ]     0xbfc0037c [1fc0037c]  00000000 nop
+[VZ]     0xbfc00380 [1fc00380]  8c000001 lw     $r0,0x1($r0)
+[VZ]     0xbfc00384 [1fc00384]  42000018 eret
+[VZ]     0xbfc00388 [1fc00388]  00000000 nop
+[VZ] 2094 PC=0xbfc00380 [1fc00380]      8c000001 lw     $r0,0x1($r0)
+6	Гипервизор включает следующую по очереди задачу – это зависшая задача
+
+[VZ] 3048 PC=0xbfc00380 [1fc00380]      8c000001 lw     $r0,0x1($r0)
+[VZ] 3048 Exception AddrError, cause=00000010(AdEL) at PC=ffffffffbfc00380 triggered, instr=8c000001
+[VZ]   Delay state is NORMAL; mem access mode is data load
+[VZ]   Instruction dump:
+[VZ]     0xbfc00378 [1fc00378]  00000000 nop
+[VZ]     0xbfc0037c [1fc0037c]  00000000 nop
+[VZ]     0xbfc00380 [1fc00380]  8c000001 lw     $r0,0x1($r0)
+[VZ]     0xbfc00384 [1fc00384]  42000018 eret
+[VZ]     0xbfc00388 [1fc00388]  00000000 nop
+3048 Exception Interrupt, cause=00008000(Int) at PC=ffffffffbfc00380 triggered, instr=8c000001
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc00378 [1fc00378]  00000000 nop
+    0xbfc0037c [1fc0037c]  00000000 nop
+    0xbfc00380 [1fc00380]  8c000001 lw     $r0,0x1($r0)
+    0xbfc00384 [1fc00384]  42000018 eret
+    0xbfc00388 [1fc00388]  00000000 nop
+3049 PC=0xbfc00380 [1fc00380]   40ac4003 dmtc0  $t4,$8,3 # Scratch1
+3050 PC=0xbfc00384 [1fc00384]   40ad4803 dmtc0  $t5,$9,3 # Scratch2
+7	Зависшая задача прерывается прерыванием гипервизора
+
+3102 PC=0xbfc00438 [1fc00438]   402c4003 dmfc0  $t4,$8,3 # Scratch1
+3102 Reg write t4=00000000000007f7
+3103 PC=0xbfc0043c [1fc0043c]   402d4803 dmfc0  $t5,$9,3 # Scratch2
+3103 Reg write t5=0000000000000001
+3104 PC=0xbfc00440 [1fc00440]   42000018 eret
+[VZ] 3105 PC=0xbfc01000 [1fc01000]      11a0ffff beq    $t5,$r0,0xbfc01000
+[VZ] 3106 PC=0xbfc01004 [1fc01004]      400c4800 mfc0   $t4,$9 # Count
+[VZ] 3106 Reg write t4=0000000000000c23
+8	Гипервизор включает следующую по очереди задачу – штатная задача
+

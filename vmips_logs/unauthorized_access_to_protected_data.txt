@@ -1,0 +1,74 @@
+28 PC=0xbfc01064 [1fc01064]     8d8c0000 lw     $t4,0x0($t4)
+28 dmemacc: fetch 4 addr=01fc00080 data=1122334400000000 mask=11110000
+28 Reg write t4=0000000011223344
+29 PC=0xbfc01068 [1fc01068]     3c0c0000 lui    $t4,0x0
+29 Reg write t4=0000000000000000
+30 PC=0xbfc0106c [1fc0106c]     3c01bfc1 lui    $r1,0xbfc1
+30 Reg write r1=bfc10000
+31 PC=0xbfc01070 [1fc01070]     658c0000 daddiu $t4,$t4,0x0
+31 Reg write t4=0000000000000000
+32 PC=0xbfc01074 [1fc01074]     64210000 daddiu $r1,$r1,0x0
+32 Reg write r1=bfc10000
+33 PC=0xbfc01078 [1fc01078]     000c603c dsll32 $t4,$t4,0
+33 Reg write t4=0000000000000000
+34 PC=0xbfc0107c [1fc0107c]     0181602d daddu  $t4,$t4,$r1
+34 Reg write t4=bfc10000
+35 PC=0xbfc01080 [1fc01080]     8d8c0000 lw     $t4,0x0($t4)
+35 dmemacc: fetch 4 addr=01fc10000 data=5566778800000000 mask=11110000
+35 Reg write t4=0000000055667788
+9	Гипервизор имеет доступ к секретным ключам
+
+53 PC=0xbfc010c8 [1fc010c8]     40ac7000 dmtc0  $t4,$14 # EPC
+54 PC=0xbfc010cc [1fc010cc]     40acf000 dmtc0  $t4,$30 # ErrorEPC
+55 PC=0xbfc010d0 [1fc010d0]     00000040 ssnop
+56 PC=0xbfc010d4 [1fc010d4]     00000040 ssnop
+57 PC=0xbfc010d8 [1fc010d8]     00000040 ssnop
+58 PC=0xbfc010dc [1fc010dc]     00000040 ssnop
+59 PC=0xbfc010e0 [1fc010e0]     42000018 eret
+[VZ] MPU GVA: ffffffffbfc00000 GPA: 000000001fc00000 HPA: 0000000000010000 CCA: 8
+[VZ] 60 PC=0xbfc00000 [1fc00000]        3c0c0000 lui    $t4,0x0
+[VZ] 60 Reg write t4=0000000000000000
+10	Запуск задачи в режиме гостевой системы, которая исполняется как бы из ПЗУ, но на самом деле обращения транслируются в ОЗУ
+
+[VZ] 65 Reg write t4=ffffffffbfc00080
+[VZ] MPU GVA: ffffffffbfc00018 GPA: 000000001fc00018 HPA: 0000000000010018 CCA: 8
+[VZ] 66 PC=0xbfc00018 [1fc00018]        8d8c0000 lw     $t4,0x0($t4)
+[VZ] MPU GVA: ffffffffbfc00080 GPA: 000000001fc00080 HPA: 0000000000010080 CCA: 8
+[VZ] 66 dmemacc: fetch 4 addr=000010080 data=0000000000000000 mask=11110000 
+[VZ] 66 Reg write t4=0000000000000000
+11	Задача обращается в место расположения первого секретного ключа по адресу 0xbfc0_0080, но обращение транслируется в ОЗУ, где лежит сама задача, и вычитывается 0
+
+[VZ] 72 Reg write t4=ffffffffbfc10000
+[VZ] MPU GVA: ffffffffbfc00034 GPA: 000000001fc00034 HPA: 0000000000010034 CCA: 8
+[VZ] 73 PC=0xbfc00034 [1fc00034]        8d8c0000 lw     $t4,0x0($t4)
+73 Exception Guest, cause=00000008(TLBL) at PC=ffffffffbfc00034 triggered, instr=8d8c0000
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc0002c [1fc0002c]  000c603c dsll32 $t4,$t4,0
+    0xbfc00030 [1fc00030]  0181602d daddu  $t4,$t4,$r1
+    0xbfc00034 [1fc00034]  8d8c0000 lw     $t4,0x0($t4)
+    0xbfc00038 [1fc00038]  3c0cba60 lui    $t4,0xba60
+    0xbfc0003c [1fc0003c]  a18c0000 sb     $t4,0x0($t4)
+74 PC=0xbfc00380 [1fc00380]     40ac4003 dmtc0  $t4,$8,3 # Scratch1
+75 PC=0xbfc00384 [1fc00384]     402c7000 dmfc0  $t4,$14 # EPC
+75 Reg write t4=ffffffffbfc00034
+12	Задача обращается в место расположения второго секретного ключа по адресу 0xbfc1_0000, но случается исключение и управление переходит гипервизору
+
+[VZ] MPU GVA: ffffffffbfc00038 GPA: 000000001fc00038 HPA: 0000000000010038 CCA: 8
+[VZ] 80 PC=0xbfc00038 [1fc00038]        3c0cba60 lui    $t4,0xba60
+[VZ] 80 Reg write t4=ffffffffba600000
+[VZ] MPU GVA: ffffffffbfc0003c GPA: 000000001fc0003c HPA: 000000000001003c CCA: 8
+[VZ] 81 PC=0xbfc0003c [1fc0003c]        a18c0000 sb     $t4,0x0($t4)
+81 Exception Guest, cause=0000000c(TLBS) at PC=ffffffffbfc0003c triggered, instr=a18c0000
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc00034 [1fc00034]  8d8c0000 lw     $t4,0x0($t4)
+    0xbfc00038 [1fc00038]  3c0cba60 lui    $t4,0xba60
+    0xbfc0003c [1fc0003c]  a18c0000 sb     $t4,0x0($t4) 
+    0xbfc00040 [1fc00040]  43ffffe0 wait   0x7ffff
+    [1fc00044]  00000000 nop
+82 PC=[1fc00380]     40ac4003 dmtc0  $t4,$8,3 # Scratch1
+83 PC=0xbfc00384 [1fc00384]     402c7000 dmfc0  $t4,$14 # EPC
+83 Reg write t4=ffffffffbfc0003c
+13	Задача обращается к регистрам контроллера SPI, но случается исключение и управление переходит к гипервизору
+

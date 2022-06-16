@@ -1,0 +1,57 @@
+1 PC=0xbfc00000 [1fc00000]      0bf00400 j      0xbfc01000
+2 PC=0xbfc00004 [1fc00004]      00000000 nop
+3 PC=0xbfc01000 [1fc01000]      400c8000 mfc0   $t4,$16 # Config
+19	Первоначальная программа загрузки запускается при старте процессора
+
+45 PC=0xbfc010a8 [1fc010a8]     42000018 eret
+[VZ] 46 PC=0xbfc00000 [1fc00000]        3c0c0000 lui    $t4,0x0
+[VZ] 46 Reg write t4=0000000000000000
+20	Первоначальная программа загрузки становится гипервизором и запускает в гостевом режиме следующую программу – вторичный загрузчик
+
+[VZ] 51 Reg write t4=ffffffffbfc01000
+[VZ] 52 PC=0xbfc00018 [1fc00018]        42000028 hypcall 0x000
+52 Exception Guest, cause=0000006c(GE) at PC=ffffffffbfc00018 triggered, instr=42000028
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc00010 [1fc00010]  000c603c dsll32 $t4,$t4,0
+    0xbfc00014 [1fc00014]  0181602d daddu  $t4,$t4,$r1
+    0xbfc00018 [1fc00018]  42000028 hypcall 0x000
+    0xbfc0001c [1fc0001c]  3c0c0000 lui    $t4,0x0
+    0xbfc00020 [1fc00020]  3c01bfc0 lui    $r1,0xbfc0
+53 PC=0xbfc00380 [1fc00380]     403f7000 dmfc0  $ra,$14 # EPC
+53 Reg write ra=ffffffffbfc00018
+21	Вторичный загрузчик использует интерфейс гипервизора для проверки подлинности и запуска последующей программы по адресу 0xbfc0_1000
+
+66 PC=0xbfc003b4 [1fc003b4]     11cd0004 beq    $t6,$t5,0xbfc003c8
+67 PC=0xbfc003b8 [1fc003b8]     00000000 nop
+68 PC=0xbfc003c8 [1fc003c8]     000000c0 ehb
+69 PC=0xbfc003cc [1fc003cc]     42000018 eret
+[VZ] 70 PC=0xbfc01000 [1fc01000]        03e00008 jr     $ra
+[VZ] 71 PC=0xbfc01004 [1fc01004]        8d8c0000 lw     $t4,0x0($t4)
+[VZ] 71 dmemacc: fetch 4 addr=000011000 data=03e0000800000000 mask=11110000 
+[VZ] 71 Reg write t4=0000000003e00008
+22	Гипервизор, удостоверившись в подлинности программы, передаёт ей управление, но также в гостевом режиме
+
+[VZ] 77 Reg write t4=ffffffffbfc02000
+[VZ] 78 PC=0xbfc00034 [1fc00034]        42000028 hypcall 0x000
+78 Exception Guest, cause=0000006c(GE) at PC=ffffffffbfc00034 triggered, instr=42000028
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc0002c [1fc0002c]  000c603c dsll32 $t4,$t4,0
+    0xbfc00030 [1fc00030]  0181602d daddu  $t4,$t4,$r1
+    0xbfc00034 [1fc00034]  42000028 hypcall 0x000
+    0xbfc00038 [1fc00038]  43ffffe0 wait   0x7ffff
+    0xbfc0003c [1fc0003c]  00000000 nop
+79 PC=0xbfc00380 [1fc00380]     403f7000 dmfc0  $ra,$14 # EPC
+79 Reg write ra=ffffffffbfc00034
+23	Вторичный загрузчик использует интерфейс гипервизора для проверки подлинности и запуска последующей программы по адресу 0xbfc0_2000
+
+92 PC=0xbfc003b4 [1fc003b4]     11cd0004 beq    $t6,$t5,0xbfc003c8
+93 PC=0xbfc003b8 [1fc003b8]     00000000 nop
+94 PC=0xbfc003bc [1fc003bc]     40bf7000 dmtc0  $ra,$14 # EPC
+95 PC=0xbfc003c0 [1fc003c0]     000000c0 ehb
+96 PC=0xbfc003c4 [1fc003c4]     42000018 eret
+[VZ] 97 PC=0xbfc00038 [1fc00038]        43ffffe0 wait   0x7ffff
+[VZ] * WAIT 0x7ffff instruction reached -- HALTING *
+24	Гипервизор не подтверждает подлинность предлагаемой для запуска программы и возвращает управление вторичному загрузчику
+

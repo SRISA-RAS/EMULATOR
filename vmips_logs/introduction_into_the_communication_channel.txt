@@ -1,0 +1,64 @@
+45 PC=0xbfc010a8 [1fc010a8]     42000018 eret
+[VZ] 46 PC=0xbfc00000 [1fc00000]        3c0cbff7 lui    $t4,0xbff7
+[VZ] 46 Reg write t4=ffffffffbff70000
+[VZ] 47 PC=0xbfc00004 [1fc00004]        358c0000 ori    $t4,$t4,0x0
+[VZ] 47 Reg write t4=ffffffffbff70000
+[VZ] 48 PC=0xbfc00008 [1fc00008]        818d0000 lb     $t5,0x0($t4)
+48 Exception Guest, cause=00000008(TLBL) at PC=ffffffffbfc00008 triggered, instr=818d0000
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc00000 [1fc00000]  3c0cbb00 lui    $t4,0xbb00
+    0xbfc00004 [1fc00004]  358c0160 ori    $t4,$t4,0x160
+    0xbfc00008 [1fc00008]  818d0000 lb     $t5,0x0($t4)
+    0xbfc0000c [1fc0000c]  01a07025 or     $t6,$t5,$r0
+    0xbfc00010 [1fc00010]  818d0000 lb     $t5,0x0($t4)
+49 PC=0xbfc00380 [1fc00380]     403a7000 dmfc0  $k0,$14 # EPC
+49 Reg write k0=ffffffffbfc00008
+31	Гипервизор запускает гостевую систему, которая обращается в регистр приёма данных. Обращение захватывается гипервизором
+
+52 Reg write k0=ffffffffbff70000
+53 PC=0xbfc00390 [1fc00390]     935a0000 lbu    $k0,0x0($k0)
+53 Reg write k0=0000000000000031
+32	Гипервизор на запрос от гостевой системы запрашивает данные из физического канала UART, получает байт 0x31
+
+54 PC=0xbfc00394 [1fc00394]     3b5b0080 xori   $k1,$k0,0x80
+54 Reg write k1=00000000000000b1
+55 PC=0xbfc00398 [1fc00398]     337a0080 andi   $k0,$k1,0x80
+55 Reg write k0=0000000000000080
+56 PC=0xbfc0039c [1fc0039c]     17400003 bne    $k0,$r0,0xbfc003ac
+57 PC=0xbfc003a0 [1fc003a0]     00000000 nop
+58 PC=0xbfc003ac [1fc003ac]     240d0000 addiu  $t5,$r0,0x0
+58 Reg write t5=0000000000000000
+59 PC=0xbfc003b0 [1fc003b0]     42000018 eret
+[VZ] 60 PC=0xbfc0000c [1fc0000c]        01a07025 or     $t6,$t5,$r0
+[VZ] 60 Reg write t6=0000000000000000
+
+33	Гипервизор расшифровывает байт, проводит валидацию, обнаруживает, что это посторонние данные и отбрасывает их. Гостевая система получает 0
+
+[VZ] 61 PC=0xbfc00010 [1fc00010]        818d0000 lb     $t5,0x0($t4)
+61 Exception Guest, cause=00000008(TLBL) at PC=bfc00010 triggered, instr=818d0000
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc00008 [1fc00008]  818d0000 lb     $t5,0x0($t4)
+    0xbfc0000c [1fc0000c]  01a07025 or     $t6,$t5,$r0
+    0xbfc00010 [1fc00010]  818d0000 lb     $t5,0x0($t4)
+    0xbfc00014 [1fc00014]  01a07025 or     $t6,$t5,$r0
+    0xbfc00018 [1fc00018]  43ffffe0 wait   0x7ffff
+62 PC=0xbfc00380 [1fc00380]     403a7000 dmfc0  $k0,$14 # EPC
+62 Reg write k0=bfc00010
+…
+66 PC=0xbfc00390 [1fc00390]     935a0000 lbu    $k0,0x0($k0)
+66 Reg write k0=00000000000000b1
+67 PC=0xbfc00394 [1fc00394]     3b5b0080 xori   $k1,$k0,0x80
+67 Reg write k1=0000000000000031
+68 PC=0xbfc00398 [1fc00398]     337a0080 andi   $k0,$k1,0x80
+68 Reg write k0=0000000000000000
+69 PC=0xbfc0039c [1fc0039c]     17400003 bne    $k0,$r0,0xbfc003ac
+70 PC=0xbfc003a0 [1fc003a0]     00000000 nop
+71 PC=0xbfc003a4 [1fc003a4]     03606825 or     $t5,$k1,$r0
+71 Reg write t5=0000000000000031
+72 PC=0xbfc003a8 [1fc003a8]     42000018 eret
+[VZ] 73 PC=0xbfc00014 [1fc00014]        01a07025 or     $t6,$t5,$r0
+[VZ] 73 Reg write t6=0000000000000031
+34	Гостевая система запрашивает очередные данные. В ответ гипервизор выполняет запрос к физическому каналу, производится расшифровка и валидацию данных. Данные оказываются правильно зашифрованными и они передаются в гостевую систему
+

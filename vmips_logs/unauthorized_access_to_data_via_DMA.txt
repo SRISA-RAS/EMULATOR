@@ -1,0 +1,90 @@
+22 PC=0xbfc0104c [1fc0104c]     3c0ca000 lui    $t4,0xa000
+22 Reg write t4=ffffffffa0000000
+23 PC=0xbfc01050 [1fc01050]     358c2000 ori    $t4,$t4,0x2000
+23 Reg write t4=ffffffffa0002000
+24 PC=0xbfc01054 [1fc01054]     3c0d1122 lui    $t5,0x1122
+24 Reg write t5=0000000011220000
+25 PC=0xbfc01058 [1fc01058]     35ad3344 ori    $t5,$t5,0x3344
+25 Reg write t5=0000000011223344
+26 PC=0xbfc0105c [1fc0105c]     ad8d0000 sw     $t5,0x0($t4)
+26 dmemacc: store 4 addr=000002000 data=4433221100000000 mask=11110000 
+...
+100 PC=0xbfc01184 [1fc01184]    42000018 eret
+[VZ] 101 PC=0xbfc00000 [1fc00000]       3c0ebb00 lui    $t6,0xbb00
+[VZ] 101 Reg write t6=ffffffffbb000000
+25	Гипервизор записывает в память по адресу 0x2000 секретные данные и запускает задачу
+
+[VZ] 102 Reg write t6=ffffffffbb000160
+...
+[VZ] 103 Reg write t5=0000000000002000
+[VZ] 104 PC=0xbfc0000c [1fc0000c]       adcd0000 sw $t5,0x0($t6)
+...
+[VZ] 105 Reg write t5=0000000000100000
+[VZ] 106 PC=0xbfc00014 [1fc00014]       adcd0004 sw $t5,0x4($t6)
+...
+[VZ] 107 Reg write t5=0000000000000004
+[VZ] 108 PC=0xbfc0001c [1fc0001c]       adcd0008 sw $t5,0x8($t6)
+...
+[VZ] 109 Reg write t5=0000000000000005
+[VZ] 110 PC=0xbfc00024 [1fc00024]       adcd000c sw     $t5,0xc($t6)
+26	Задача программирует DMA для копирования 4-х байт с адреса 0x2000 из недоступной для задачи области в адрес 0x10_0000 в доступную для задачи область
+
+[VZ] 111 Reg write t4=ffffffffa1000000
+[VZ] 112 PC=0xbfc0002c [1fc0002c]       8d8d0000 lw $t5,0x0($t4)
+[VZ] MPU GVA: ffffffffa1000000 GPA: 0000000001000000 HPA: 100000 CCA: 8
+[VZ] 112 dmemacc: fetch 4 addr=000100000 data=4433221100000000 mask=11110000 
+[VZ] 112 Reg write t5=0000000011223344
+27	Гостевая система получила косвенный доступ к секретным данным гипервизора с помощью DMA
+
+[VZ] 118 Reg write t4=ffffffffa0002000
+[VZ] 119 PC=0xbfc00048 [1fc00048]       8d8d0000 lw     $t5,0x0($t4)
+119 Exception Guest, cause=00000008(TLBL) at PC=ffffffffbfc00048 triggered, instr=8d8d0000
+  Delay state is NORMAL; mem access mode is not applicable
+  Instruction dump:
+    0xbfc00040 [1fc00040]  3c0ca000 lui    $t4,0xa000
+    0xbfc00044 [1fc00044]  358c2000 ori    $t4,$t4,0x2000
+    0xbfc00048 [1fc00048]  8d8d0000 lw     $t5,0x0($t4)
+    0xbfc0004c [1fc0004c]  43ffffe0 wait   0x7ffff
+    0xbfc00050 [1fc00050]  00000000 nop
+120 PC=0xbfc00380 [1fc00380]    3c0ca010 lui    $t4,0xa010
+28	Напрямую ей эти данные недоступны
+
+123 Reg write t4=ffffffffbb162020
+...
+124 Reg write t5=0000000000100000
+125 PC=0xbfc00394 [1fc00394]    fd8d0000 sd     $t5,0x0($t4)
+...
+126 Reg write t5=0000000000000000
+127 PC=0xbfc0039c [1fc0039c]    fd8d0008 sd     $t5,0x8($t4)
+...
+128 Reg write t5=0000000000000002
+129 PC=0xbfc003a4 [1fc003a4]    fd8d0040 sd     $t5,0x40($t4)
+...
+131 Reg write t5=00000000000fffff
+132 PC=0xbfc003b0 [1fc003b0]    fd8d0048 sd     $t5,0x48($t4)
+...
+142 PC=0xbfc01184 [1fc01184]    42000018 eret
+[VZ] 143 PC=0xbfc00000 [1fc00000]       3c0ebb00 lui    $t6,0xbb00
+29	Гипервизор перезапускает задачу, на этот раз с включенным IOMMU
+
+[VZ] 144 Reg write t6=ffffffffbb000160
+...
+[VZ] 145 Reg write t5=0000000000002000
+[VZ] 146 PC=0xbfc0000c [1fc0000c]       adcd0000 sw $t5,0x0($t6)
+...
+[VZ] 147 Reg write t5=0000000000100000
+[VZ] 148 PC=0xbfc00014 [1fc00014]       adcd0004 sw $t5,0x4($t6)
+...
+[VZ] 149 Reg write t5=0000000000000004
+[VZ] 150 PC=0xbfc0001c [1fc0001c]       adcd0008 sw $t5,0x8($t6)
+...
+[VZ] 151 Reg write t5=0000000000000005
+[VZ] 152 PC=0xbfc00024 [1fc00024]       adcd000c sw $t5,0xc($t6)
+...
+[VZ] 153 Reg write t4=ffffffffa1000000
+[VZ] 154 PC=0xbfc0002c [1fc0002c]       8d8d0000 lw $t5,0x0($t4)
+[VZ] MPU GVA: ffffffffa1000000 GPA: 0000000001000000 HPA: 0000000000100000 CCA: 8
+[VZ] 154 dmemacc: fetch 4 addr=000100000 data=0000000000000000 mask=11110000 
+[VZ] 154 Reg write t5=0000000000000000
+30	Задача программирует DMA для копирования 4-х байт с адреса 0x2000 из недоступной для задачи области в адрес 0x10_0000 в доступную для задачи область. В результате DMA не смог прочитать секретные данные — транзакция была заблокирована
+
